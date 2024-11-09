@@ -21,7 +21,7 @@ class Cache:
             for idx, col in enumerate(cursor.description):
                 d[col[0]] = row[idx]
             return d
-        
+
         self.db.row_factory = dict_factory
         self.cur = self.db.cursor()
         self.table_name = table
@@ -58,7 +58,7 @@ class Cache:
             file_path = Path(file_path)
         else:
             fp = str(file_path)
-        
+
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
         hash = self.hash_file(file_path)
@@ -86,7 +86,7 @@ class Cache:
             raise ValueError("Invalid file_path")
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
-        
+
         if isinstance(values, dict):
             values = json.dumps(values, indent=4)
         else:
