@@ -30,7 +30,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-     
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -60,6 +60,9 @@ jobs:
       - name: Style Guide
         run: flake8
   build-and-publish:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     name: Build and publish Python 🐍 distributions 📦 to PyPI and TestPyPI
     needs: unit-tests
     runs-on: ubuntu-latest
