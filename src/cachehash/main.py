@@ -69,7 +69,7 @@ class Cache:
                 h.update(str(stat.st_mtime).encode())
                 # Also include file content hash
                 h.update(self.hash_file(file_path).encode())
-        
+
         return h.hexdigest()
 
     def get_hash(self, path: Path) -> str:
@@ -93,7 +93,7 @@ class Cache:
 
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
-        
+
         hash = self.get_hash(file_path)
         row = self.query(
             'get_record',
