@@ -2,6 +2,7 @@ import json
 import sqlite3
 
 from pathlib import Path
+from typing import Union
 
 from xxhash import xxh32 as xh
 
@@ -49,9 +50,9 @@ class Cache:
         return h.hexdigest()
 
     def get(
-            self, file_path: str | Path,
+            self, file_path: Union[str, Path],
             only_valid: bool = True
-            ) -> str | None:
+            ) -> Union[str, None]:
         fp: str
         if type(file_path) is str:
             fp = file_path
@@ -75,7 +76,7 @@ class Cache:
             else:
                 return None
 
-    def set(self, file_path: str | Path, values: dict):
+    def set(self, file_path: Union[str, Path], values: dict):
         fp: str
         if type(file_path) is str:
             fp = file_path
