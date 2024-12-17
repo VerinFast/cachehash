@@ -136,3 +136,4 @@ class Cache:
                 "value": values,
             }
         )
+        self.db.commit()
