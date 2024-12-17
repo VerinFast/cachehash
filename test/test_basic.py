@@ -24,6 +24,42 @@ def test_basics():
     assert not test_db.exists(), "Test DB not removed"
 
 
+def test_close_and_reopen():
+    test_db = Path("test.db")
+    assert not test_db.exists(), "Test DB exists"
+    cache = Cache("test.db")
+    now = str(datetime.datetime.now())
+    sleep(0.1)
+    this_file = os.path.abspath(__file__)
+    cache.set(this_file, {"now": now})
+    sleep(0.1)
+    cache.db.close()
+    del cache
+    cache = Cache("test.db")
+    new_now = cache.get(this_file)["now"]
+    assert test_db.exists(), "Test DB not created"
+    assert now == new_now, "Invalid 'now"
+    os.remove(test_db)
+    assert not test_db.exists(), "Test DB not removed"
+
+
+def test_second_connection():
+    test_db = Path("test.db")
+    assert not test_db.exists(), "Test DB exists"
+    cache = Cache("test.db")
+    now = str(datetime.datetime.now())
+    sleep(0.1)
+    this_file = os.path.abspath(__file__)
+    cache.set(this_file, {"now": now})
+    sleep(0.1)
+    cache2 = Cache("test.db")
+    new_now = cache2.get(this_file)["now"]
+    assert test_db.exists(), "Test DB not created"
+    assert now == new_now, "Invalid 'now"
+    os.remove(test_db)
+    assert not test_db.exists(), "Test DB not removed"
+
+
 def test_directory_hash():
     # Clean up any leftover test DB from previous runs
     test_db = Path("test_dir.db")
