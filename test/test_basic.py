@@ -23,6 +23,7 @@ def test_basics():
     os.remove(test_db)
     assert not test_db.exists(), "Test DB not removed"
 
+
 def test_close_and_reopen():
     test_db = Path("test.db")
     assert not test_db.exists(), "Test DB exists"
@@ -41,6 +42,7 @@ def test_close_and_reopen():
     os.remove(test_db)
     assert not test_db.exists(), "Test DB not removed"
 
+
 def test_second_connection():
     test_db = Path("test.db")
     assert not test_db.exists(), "Test DB exists"
@@ -56,6 +58,7 @@ def test_second_connection():
     assert now == new_now, "Invalid 'now"
     os.remove(test_db)
     assert not test_db.exists(), "Test DB not removed"
+
 
 def test_directory_hash():
     # Clean up any leftover test DB from previous runs
