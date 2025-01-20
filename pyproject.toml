@@ -4,7 +4,8 @@ requires = [
   "setuptools",
   "setuptools_scm[toml]>=6.0",
   "build",
-  "hatch-requirements-txt"
+  "hatch-requirements-txt",
+  "flake8-pytest-style~=2.1.0"
 ]
 build-backend = "hatchling.build"
 
