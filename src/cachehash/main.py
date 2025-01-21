@@ -1,7 +1,8 @@
 import json
 import sqlite3
-
+import os
 from pathlib import Path
+from typing import Union
 
 from xxhash import xxh32 as xh
 
@@ -48,10 +49,42 @@ class Cache:
                 h.update(data)
         return h.hexdigest()
 
+    def hash_directory(self, directory: Path) -> str:
+        h = xh()
+        # Walk through directory in a sorted manner for consistency
+        for root, dirs, files in sorted(os.walk(directory)):
+            # Hash directory names
+            for d in sorted(dirs):
+                dir_path = Path(root) / d
+                # Add directory name and metadata to hash
+                h.update(str(dir_path.relative_to(directory)).encode())
+                h.update(str(dir_path.stat().st_mtime).encode())
+
+            # Hash files
+            for f in sorted(files):
+                file_path = Path(root) / f
+                # Add file path, size, and modification time to hash
+                h.update(str(file_path.relative_to(directory)).encode())
+                stat = file_path.stat()
+                h.update(str(stat.st_size).encode())
+                h.update(str(stat.st_mtime).encode())
+                # Also include file content hash
+                h.update(self.hash_file(file_path).encode())
+
+        return h.hexdigest()
+
+    def get_hash(self, path: Path) -> str:
+        if path.is_file():
+            return self.hash_file(path)
+        elif path.is_dir():
+            return self.hash_directory(path)
+        else:
+            raise ValueError(f"{path} is neither a file nor a directory")
+
     def get(
-            self, file_path: str | Path,
+            self, file_path: Union[str, Path],
             only_valid: bool = True
-            ) -> str | None:
+            ) -> Union[str, None]:
         fp: str
         if type(file_path) is str:
             fp = file_path
@@ -61,7 +94,8 @@ class Cache:
 
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
-        hash = self.hash_file(file_path)
+
+        hash = self.get_hash(file_path)
         row = self.query(
             'get_record',
             {
@@ -75,15 +109,16 @@ class Cache:
             else:
                 return None
 
-    def set(self, file_path: str | Path, values: dict):
+    def set(self, file_path: Union[str, Path], values: dict):
         fp: str
-        if type(file_path) is str:
+        if isinstance(file_path, str):
             fp = file_path
             file_path = Path(file_path)
-        elif type(file_path) is Path:
+        elif isinstance(file_path, Path):
             fp = str(file_path)
         else:
             raise ValueError("Invalid file_path")
+
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
 
@@ -92,7 +127,7 @@ class Cache:
         else:
             raise ValueError("Must pass values as a dict")
 
-        hash = self.hash_file(file_path)
+        hash = self.get_hash(file_path)
         self.query(
             "insert_record",
             {
@@ -101,3 +136,4 @@ class Cache:
                 "value": values,
             }
         )
+        self.db.commit()
