@@ -48,7 +48,7 @@ jobs:
       - name: Make VERSION
         run: python make_version.py
       - name: install self
-        run: pip install -e .
+        run: pip install -e ".[dev]"
       - name: Unit Tests
         run: |
             echo "Attempting PyTest"
