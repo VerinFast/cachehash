@@ -58,7 +58,9 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - name: Style Guide
-        run: flake8
+        run: |
+          pip install black
+          black --check .
   build-and-publish:
     permissions:
       contents: 'read'
