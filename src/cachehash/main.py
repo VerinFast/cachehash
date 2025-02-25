@@ -84,7 +84,7 @@ class Cache:
     def get(
             self, file_path: Union[str, Path],
             only_valid: bool = True
-            ) -> Union[str, None]:
+            ) -> Union[str, list, dict, int, float, complex, None]:
         fp: str
         if type(file_path) is str:
             fp = file_path
@@ -105,11 +105,13 @@ class Cache:
             return None
         else:
             if row["hash"] == hash or not only_valid:
-                return json.loads(row["val"])
+                return self._values_from_str(row["val"])
             else:
                 return None
 
-    def set(self, file_path: Union[str, Path], values: dict):
+    def set(self, file_path: Union[str, Path], values: Union[str, list, dict, int, float, complex, None]):
+        if not isinstance(values, (str, list, dict, int, float, complex)):
+            raise ValueError("Invalid values")
         fp: str
         if isinstance(file_path, str):
             fp = file_path
@@ -121,19 +123,55 @@ class Cache:
 
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
-
-        if isinstance(values, dict):
-            values = json.dumps(values, indent=4)
-        else:
-            raise ValueError("Must pass values as a dict")
+        
+        values = self._values_to_str(values)
 
         hash = self.get_hash(file_path)
-        self.query(
-            "insert_record",
+        existing_record = self.query(
+            'get_record',
             {
                 "key": fp,
-                "hash": str(hash),
-                "value": values,
-            }
-        )
+            }).fetchone()
+        if existing_record is not None:
+            self.query(
+                "update_record",
+                {
+                    "key": fp,
+                    "hash": str(hash),
+                    "value": values,
+                }
+            )
+        else:
+            self.query(
+                "insert_record",
+                {
+                    "key": fp,
+                    "hash": str(hash),
+                    "value": values,
+                }
+            )
         self.db.commit()
+
+    def _values_to_str(self, values):
+        if isinstance(values, (dict, list)):
+            return json.dumps(values)
+        return str(values)
+    
+    def _values_from_str(self, values):
+        try:
+            return json.loads(values)
+        except json.JSONDecodeError:
+            pass
+        try:
+            return int(values)
+        except ValueError:
+            pass
+        try:
+            return float(values)
+        except ValueError:
+            pass
+        try:
+            return complex(values)
+        except ValueError:
+            pass
+        return values
