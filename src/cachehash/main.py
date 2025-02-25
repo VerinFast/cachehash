@@ -6,7 +6,7 @@ from typing import Union
 
 from xxhash import xxh32 as xh
 
-default_path = Path('./temp.db')
+default_path = Path("./temp.db")
 
 
 class Cache:
@@ -30,7 +30,7 @@ class Cache:
 
     def query(self, file_name: str, parameters=None):
         cur_path = Path(__file__).parent.resolve().absolute()
-        path = Path(f'{cur_path}/sql/{file_name}.sql')
+        path = Path(f"{cur_path}/sql/{file_name}.sql")
         with open(path, "r") as f:
             query = f.read()
             query = query.replace("<table_name>", f'"{self.table_name}"')
@@ -41,7 +41,7 @@ class Cache:
 
     def hash_file(self, fp: Path) -> str:
         h = xh()
-        with open(fp, 'rb') as f:
+        with open(fp, "rb") as f:
             while True:
                 data = f.read(self.BUF_SIZE)
                 if not data:
@@ -82,9 +82,8 @@ class Cache:
             raise ValueError(f"{path} is neither a file nor a directory")
 
     def get(
-            self, file_path: Union[str, Path],
-            only_valid: bool = True
-            ) -> Union[str, list, dict, int, float, complex, None]:
+        self, file_path: Union[str, Path], only_valid: bool = True
+    ) -> Union[str, list, dict, int, float, complex, None]:
         fp: str
         if type(file_path) is str:
             fp = file_path
@@ -97,10 +96,11 @@ class Cache:
 
         hash = self.get_hash(file_path)
         row = self.query(
-            'get_record',
+            "get_record",
             {
                 "key": fp,
-            }).fetchone()
+            },
+        ).fetchone()
         if row is None:
             return None
         else:
@@ -109,7 +109,11 @@ class Cache:
             else:
                 return None
 
-    def set(self, file_path: Union[str, Path], values: Union[str, list, dict, int, float, complex, None]):
+    def set(
+        self,
+        file_path: Union[str, Path],
+        values: Union[str, list, dict, int, float, complex, None],
+    ):
         if not isinstance(values, (str, list, dict, int, float, complex)):
             raise ValueError("Invalid values")
         fp: str
@@ -123,15 +127,16 @@ class Cache:
 
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
-        
+
         values = self._values_to_str(values)
 
         hash = self.get_hash(file_path)
         existing_record = self.query(
-            'get_record',
+            "get_record",
             {
                 "key": fp,
-            }).fetchone()
+            },
+        ).fetchone()
         if existing_record is not None:
             self.query(
                 "update_record",
@@ -139,7 +144,7 @@ class Cache:
                     "key": fp,
                     "hash": str(hash),
                     "value": values,
-                }
+                },
             )
         else:
             self.query(
@@ -148,7 +153,7 @@ class Cache:
                     "key": fp,
                     "hash": str(hash),
                     "value": values,
-                }
+                },
             )
         self.db.commit()
 
@@ -156,7 +161,7 @@ class Cache:
         if isinstance(values, (dict, list)):
             return json.dumps(values)
         return str(values)
-    
+
     def _values_from_str(self, values):
         try:
             return json.loads(values)
