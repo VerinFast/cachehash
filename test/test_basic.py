@@ -110,7 +110,8 @@ def test_directory_hash():
         sleep(0.1)  # Ensure modification time changes
         (temp_path / "file1.txt").write_text("modified content")
         cached_value = cache.get(temp_path)
-        assert cached_value is None, "Cache should be invalid after file modification"
+        if not cached_value is None:
+            raise AssertionError("Cache should be invalid after file modification") # noqa
 
         os.remove(test_db)
         assert not test_db.exists(), "Test DB not removed"
@@ -180,7 +181,8 @@ def test_valid_types():
     sleep(0.1)
     cache_value_complex = cache.get(this_file)
     assert cache_value_complex == 42 + 42j, "Invalid Complex value"
-    assert isinstance(cache_value_complex, complex), "Invalid Complex value type"
+    if not isinstance(cache_value_complex, complex):
+        raise AssertionError("Invalid Complex value type")
 
     assert test_db.exists(), "Test DB not created"
     os.remove(test_db)
