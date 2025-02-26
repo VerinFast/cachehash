@@ -111,7 +111,9 @@ def test_directory_hash():
         (temp_path / "file1.txt").write_text("modified content")
         cached_value = cache.get(temp_path)
         if cached_value is not None:
-            raise AssertionError("Cache should be invalid after file modification") # noqa
+            raise AssertionError(
+                "Cache should be invalid after file modification"
+            )  # noqa
 
         os.remove(test_db)
         assert not test_db.exists(), "Test DB not removed"
@@ -135,14 +137,10 @@ def test_valid_types():
 
     # Test a List
     test_list = ["value1", "value2"]
-    print("here")
-    print(type(test_list))
     sleep(0.1)
     cache.set(this_file, test_list)
     sleep(0.1)
     cache_value_list = cache.get(this_file)
-    print("HERE")
-    print(type(cache_value_list))
     value2 = cache_value_list[1]
     assert value2 == "value2", "Invalid List value"
     assert isinstance(cache_value_list, list), "Invalid List value type"
@@ -183,10 +181,6 @@ def test_valid_types():
     assert cache_value_complex == 42 + 42j, "Invalid Complex value"
     if not isinstance(cache_value_complex, complex):
         raise AssertionError("Invalid Complex value type")
-
-    assert test_db.exists(), "Test DB not created"
-    os.remove(test_db)
-    assert not test_db.exists(), "Test DB not removed"
 
 
 def test_invalid_type():

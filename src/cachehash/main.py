@@ -168,14 +168,6 @@ class Cache:
         except json.JSONDecodeError:
             pass
         try:
-            return int(values)
-        except ValueError:
-            pass
-        try:
-            return float(values)
-        except ValueError:
-            pass
-        try:
             return complex(values)
         except ValueError:
             pass
