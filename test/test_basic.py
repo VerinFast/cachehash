@@ -120,6 +120,10 @@ def test_directory_hash():
 
 
 def test_valid_types():
+    # Clean up any leftover test DB from previous runs
+    test_db = Path("test.db")
+    if test_db.exists():
+        os.remove(test_db)
     test_db = Path("test.db")
     assert not test_db.exists(), "Test DB exists"
     cache = Cache("test.db")
@@ -184,6 +188,10 @@ def test_valid_types():
 
 
 def test_invalid_type():
+    # Clean up any leftover test DB from previous runs
+    test_db = Path("test.db")
+    if test_db.exists():
+        os.remove(test_db)
     test_db = Path("test.db")
     assert not test_db.exists(), "Test DB exists"
     cache = Cache("test.db")
