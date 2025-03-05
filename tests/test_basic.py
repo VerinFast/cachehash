@@ -9,6 +9,8 @@ from cachehash.main import Cache
 
 def test_basics():
     test_db = Path("test.db")
+    if test_db.exists():
+        os.remove(test_db)
     assert not test_db.exists(), "Test DB exists"
     cache = Cache("test.db")
     now = str(datetime.datetime.now())
@@ -26,6 +28,8 @@ def test_basics():
 
 def test_close_and_reopen():
     test_db = Path("test.db")
+    if test_db.exists():
+        os.remove(test_db)
     assert not test_db.exists(), "Test DB exists"
     cache = Cache("test.db")
     now = str(datetime.datetime.now())
@@ -45,6 +49,8 @@ def test_close_and_reopen():
 
 def test_second_connection():
     test_db = Path("test.db")
+    if test_db.exists():
+        os.remove(test_db)
     assert not test_db.exists(), "Test DB exists"
     cache = Cache("test.db")
     now = str(datetime.datetime.now())
@@ -62,6 +68,8 @@ def test_second_connection():
 
 def test_two_writes():
     test_db = Path("test.db")
+    if test_db.exists():
+        os.remove(test_db)
     assert not test_db.exists(), "Test DB exists"
     cache = Cache("test.db")
     now = str(datetime.datetime.now())
@@ -173,16 +181,6 @@ def test_valid_types():
     assert cache_value_float == 42.42, "Invalid Float value"
     assert isinstance(cache_value_float, float), "Invalid Float value type"
 
-    # Test a Complex
-    test_complex = 42 + 42j
-    sleep(0.1)
-    cache.set(this_file, test_complex)
-    sleep(0.1)
-    cache_value_complex = cache.get(this_file)
-    assert cache_value_complex == 42 + 42j, "Invalid Complex value"
-    if not isinstance(cache_value_complex, complex):
-        raise AssertionError("Invalid Complex value type")
-
 
 def test_invalid_type():
     # Clean up any leftover test DB from previous runs
@@ -194,16 +192,71 @@ def test_invalid_type():
     cache = Cache("test.db")
     this_file = os.path.abspath(__file__)
 
-    # Test an invalid date type
+    # Test an invalid type (date) throws an error
     test_date = datetime.datetime.now()
     sleep(0.1)
     error_caught = False
     # Should throw a ValueError for invalid type
     try:
         cache.set(this_file, test_date)
-    except ValueError:
+    except TypeError:
         error_caught = True
     assert error_caught, "Invalid Date type not caught"
+
+    assert test_db.exists(), "Test DB not created"
+    os.remove(test_db)
+    assert not test_db.exists(), "Test DB not removed"
+
+def test_fake_file():
+    # Clean up any leftover test DB from previous runs
+    test_db = Path("test.db")
+    if test_db.exists():
+        os.remove(test_db)
+    test_db = Path("test.db")
+    assert not test_db.exists(), "Test DB exists"
+    cache = Cache("test.db")
+    this_file = os.path.abspath(__file__)
+    this_file = this_file + "fake"
+
+    our_dict = {"key": "value"}
+    sleep(0.1)
+    error_caught = False
+    # Should throw a ValueError for invalid file
+    try:
+        cache.set(this_file, our_dict)
+    except ValueError:
+        error_caught = True
+    assert error_caught, "Invalid file value not caught in set"
+
+    error_caught = False
+
+    try:
+        cache.get(this_file)
+    except ValueError:
+        error_caught = True
+    assert error_caught, "Invalid file value not caught in get"
+
+    assert test_db.exists(), "Test DB not created"
+    os.remove(test_db)
+    assert not test_db.exists(), "Test DB not removed"
+
+def test_valid_set_invalid_get():
+    # Clean up any leftover test DB from previous runs
+    test_db = Path("test.db")
+    if test_db.exists():
+        os.remove(test_db)
+    test_db = Path("test.db")
+    assert not test_db.exists(), "Test DB exists"
+    cache = Cache("test.db")
+    this_file = os.path.abspath(__file__)
+    other_file = str(Path(__file__).parent.absolute()) + "/__init__.py"
+
+    test_dict = {"key": "value"}
+    cache.set(this_file, test_dict)
+
+    result = cache.get(other_file, only_valid=True)
+
+    assert result is None, "Invalid file should return None"
 
     assert test_db.exists(), "Test DB not created"
     os.remove(test_db)

@@ -83,7 +83,7 @@ class Cache:
 
     def get(
         self, file_path: Union[str, Path], only_valid: bool = True
-    ) -> Union[str, list, dict, int, float, complex, None]:
+    ) -> Union[str, list, dict, int, float, None]:
         fp: str
         if type(file_path) is str:
             fp = file_path
@@ -101,21 +101,21 @@ class Cache:
                 "key": fp,
             },
         ).fetchone()
+
         if row is None:
             return None
         else:
             if row["hash"] == hash or not only_valid:
-                return self._values_from_str(row["val"])
+                return json.loads(row["val"])
             else:
                 return None
+
 
     def set(
         self,
         file_path: Union[str, Path],
-        values: Union[str, list, dict, int, float, complex, None],
+        values: Union[str, list, dict, int, float, None],
     ):
-        if not isinstance(values, (str, list, dict, int, float, complex)):
-            raise ValueError("Invalid values")
         fp: str
         if isinstance(file_path, str):
             fp = file_path
@@ -128,7 +128,7 @@ class Cache:
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
 
-        values = self._values_to_str(values)
+        values = json.dumps(values)
 
         hash = self.get_hash(file_path)
         existing_record = self.query(
@@ -157,18 +157,3 @@ class Cache:
             )
         self.db.commit()
 
-    def _values_to_str(self, values):
-        if isinstance(values, (dict, list)):
-            return json.dumps(values)
-        return str(values)
-
-    def _values_from_str(self, values):
-        try:
-            return json.loads(values)
-        except json.JSONDecodeError:
-            pass
-        try:
-            return complex(values)
-        except ValueError:
-            pass
-        return values
