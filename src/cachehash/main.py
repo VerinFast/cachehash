@@ -6,7 +6,7 @@ from typing import Union
 
 from xxhash import xxh32 as xh
 
-default_path = Path('./temp.db')
+default_path = Path("./temp.db")
 
 
 class Cache:
@@ -30,7 +30,7 @@ class Cache:
 
     def query(self, file_name: str, parameters=None):
         cur_path = Path(__file__).parent.resolve().absolute()
-        path = Path(f'{cur_path}/sql/{file_name}.sql')
+        path = Path(f"{cur_path}/sql/{file_name}.sql")
         with open(path, "r") as f:
             query = f.read()
             query = query.replace("<table_name>", f'"{self.table_name}"')
@@ -41,7 +41,7 @@ class Cache:
 
     def hash_file(self, fp: Path) -> str:
         h = xh()
-        with open(fp, 'rb') as f:
+        with open(fp, "rb") as f:
             while True:
                 data = f.read(self.BUF_SIZE)
                 if not data:
@@ -82,9 +82,8 @@ class Cache:
             raise ValueError(f"{path} is neither a file nor a directory")
 
     def get(
-            self, file_path: Union[str, Path],
-            only_valid: bool = True
-            ) -> Union[str, None]:
+        self, file_path: Union[str, Path], only_valid: bool = True
+    ) -> Union[str, list, dict, int, float, None]:
         fp: str
         if type(file_path) is str:
             fp = file_path
@@ -97,10 +96,12 @@ class Cache:
 
         hash = self.get_hash(file_path)
         row = self.query(
-            'get_record',
+            "get_record",
             {
                 "key": fp,
-            }).fetchone()
+            },
+        ).fetchone()
+
         if row is None:
             return None
         else:
@@ -109,7 +110,11 @@ class Cache:
             else:
                 return None
 
-    def set(self, file_path: Union[str, Path], values: dict):
+    def set(
+        self,
+        file_path: Union[str, Path],
+        values: Union[str, list, dict, int, float, None],
+    ):
         fp: str
         if isinstance(file_path, str):
             fp = file_path
@@ -122,18 +127,31 @@ class Cache:
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
 
-        if isinstance(values, dict):
-            values = json.dumps(values, indent=4)
-        else:
-            raise ValueError("Must pass values as a dict")
+        values = json.dumps(values)
 
         hash = self.get_hash(file_path)
-        self.query(
-            "insert_record",
+        existing_record = self.query(
+            "get_record",
             {
                 "key": fp,
-                "hash": str(hash),
-                "value": values,
-            }
-        )
+            },
+        ).fetchone()
+        if existing_record is not None:
+            self.query(
+                "update_record",
+                {
+                    "key": fp,
+                    "hash": str(hash),
+                    "value": values,
+                },
+            )
+        else:
+            self.query(
+                "insert_record",
+                {
+                    "key": fp,
+                    "hash": str(hash),
+                    "value": values,
+                },
+            )
         self.db.commit()
