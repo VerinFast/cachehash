@@ -110,10 +110,7 @@ def test_directory_hash():
         sleep(0.1)  # Ensure modification time changes
         (temp_path / "file1.txt").write_text("modified content")
         cached_value = cache.get(temp_path)
-        if cached_value is not None:
-            raise AssertionError(
-                "Cache should be invalid after file modification"
-            )  # noqa
+        assert cached_value is None, "Cache should be invalid after file modification"
 
         os.remove(test_db)
         assert not test_db.exists(), "Test DB not removed"
