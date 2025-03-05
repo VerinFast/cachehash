@@ -118,7 +118,7 @@ def test_directory_hash():
         sleep(0.1)  # Ensure modification time changes
         (temp_path / "file1.txt").write_text("modified content")
         cached_value = cache.get(temp_path)
-        assert cached_value is None, "Cache should be invalid after file modification"
+        assert cached_value is None, "Cache should None after change"
 
         os.remove(test_db)
         assert not test_db.exists(), "Test DB not removed"
@@ -207,6 +207,7 @@ def test_invalid_type():
     os.remove(test_db)
     assert not test_db.exists(), "Test DB not removed"
 
+
 def test_fake_file():
     # Clean up any leftover test DB from previous runs
     test_db = Path("test.db")
@@ -239,6 +240,7 @@ def test_fake_file():
     assert test_db.exists(), "Test DB not created"
     os.remove(test_db)
     assert not test_db.exists(), "Test DB not removed"
+
 
 def test_valid_set_invalid_get():
     # Clean up any leftover test DB from previous runs

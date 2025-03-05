@@ -110,7 +110,6 @@ class Cache:
             else:
                 return None
 
-
     def set(
         self,
         file_path: Union[str, Path],
@@ -156,4 +155,3 @@ class Cache:
                 },
             )
         self.db.commit()
-
