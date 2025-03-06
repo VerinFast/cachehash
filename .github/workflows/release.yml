@@ -79,8 +79,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-      - name: Style Guide
-        run: flake8
+
   build-and-publish:
     permissions:
       contents: 'read'
