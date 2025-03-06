@@ -142,7 +142,7 @@ class Cache:
             },
         ).fetchone()
         if existing_record is not None and append is False:
-            v = existing_record["value"]
+            v = existing_record["val"]
             if v != values:
                 self.query(
                     "update_record",
