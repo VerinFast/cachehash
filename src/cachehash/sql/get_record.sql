@@ -1,3 +1,5 @@
 select * 
     from <table_name> 
-    where key=:key
+    where hash=:hash
+    order by ID desc
+    limit 1

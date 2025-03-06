@@ -28,16 +28,23 @@ class Cache:
         self.table_name = table
         self.query("make_table")
 
-    def query(self, file_name: str, parameters=None):
+    def query(self, file_name: str, query:Union[str, None]=None, parameters=None):
         cur_path = Path(__file__).parent.resolve().absolute()
         path = Path(f"{cur_path}/sql/{file_name}.sql")
-        with open(path, "r") as f:
-            query = f.read()
+        if query:
             query = query.replace("<table_name>", f'"{self.table_name}"')
             if parameters is not None:
                 return self.cur.execute(query, parameters)
             else:
                 return self.cur.execute(query)
+        else:
+            with open(path, "r") as f:
+                query = f.read()
+                query = query.replace("<table_name>", f'"{self.table_name}"')
+                if parameters is not None:
+                    return self.cur.execute(query, parameters)
+                else:
+                    return self.cur.execute(query)
 
     def hash_file(self, fp: Path) -> str:
         h = xh()
@@ -82,7 +89,7 @@ class Cache:
             raise ValueError(f"{path} is neither a file nor a directory")
 
     def get(
-        self, file_path: Union[str, Path], only_valid: bool = True
+        self, file_path: Union[str, Path]
     ) -> Union[str, list, dict, int, float, None]:
         fp: str
         if type(file_path) is str:
@@ -98,22 +105,20 @@ class Cache:
         row = self.query(
             "get_record",
             {
-                "key": fp,
+                "hash": hash,
             },
         ).fetchone()
 
         if row is None:
             return None
         else:
-            if row["hash"] == hash or not only_valid:
-                return json.loads(row["val"])
-            else:
-                return None
+            return json.loads(row["val"])
 
     def set(
         self,
         file_path: Union[str, Path],
         values: Union[str, list, dict, int, float, None],
+        append: bool = False
     ):
         fp: str
         if isinstance(file_path, str):
@@ -133,24 +138,26 @@ class Cache:
         existing_record = self.query(
             "get_record",
             {
-                "key": fp,
+                "hash": hash,
             },
         ).fetchone()
-        if existing_record is not None:
-            self.query(
-                "update_record",
-                {
-                    "key": fp,
-                    "hash": str(hash),
-                    "value": values,
-                },
-            )
+        if existing_record is not None and append is False:
+            v = existing_record["value"]
+            if v != values:
+                self.query(
+                    "update_record",
+                    {
+                        "key": fp,
+                        "hash": hash,
+                        "value": values,
+                    },
+                )
         else:
             self.query(
                 "insert_record",
                 {
                     "key": fp,
-                    "hash": str(hash),
+                    "hash": hash,
                     "value": values,
                 },
             )
