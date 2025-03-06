@@ -28,11 +28,7 @@ class Cache:
         self.table_name = table
         self.query("make_table")
 
-    def query(self, 
-              file_name: str, 
-              parameters = None, 
-              query: Union[str, None] = None
-            ):
+    def query(self, file_name: str, parameters=None, query: Union[str, None] = None):
         cur_path = Path(__file__).parent.resolve().absolute()
         path = Path(f"{cur_path}/sql/{file_name}.sql")
         if query:
@@ -100,7 +96,7 @@ class Cache:
             # fp = file_path
             file_path = Path(file_path)
         # else:
-            # fp = str(file_path)
+        # fp = str(file_path)
 
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
@@ -122,7 +118,7 @@ class Cache:
         self,
         file_path: Union[str, Path],
         values: Union[str, list, dict, int, float, None],
-        append: bool = False
+        append: bool = False,
     ):
         fp: str
         if isinstance(file_path, str):
