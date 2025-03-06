@@ -256,7 +256,7 @@ def test_valid_set_invalid_get():
     test_dict = {"key": "value"}
     cache.set(this_file, test_dict)
 
-    result = cache.get(other_file, only_valid=True)
+    result = cache.get(other_file)
 
     assert result is None, "Invalid file should return None"
 
