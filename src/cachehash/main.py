@@ -128,7 +128,7 @@ class Cache:
         hash = self.get_hash(file_path)
         row = self.query(
             "get_record",
-            {"hash": hash},           },
+            {"hash": hash},
         ).fetchone()
 
         if row is None:
