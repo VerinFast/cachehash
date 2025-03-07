@@ -91,12 +91,12 @@ class Cache:
     def get(
         self, file_path: Union[str, Path]
     ) -> Union[str, list, dict, int, float, None]:
-        # fp: str
+        fp: str
         if type(file_path) is str:
-            # fp = file_path
+            fp = file_path
             file_path = Path(file_path)
-        # else:
-        # fp = str(file_path)
+        else:
+            fp = str(file_path)
 
         if not file_path.exists():
             raise ValueError(f"{file_path} does not exist")
@@ -106,6 +106,7 @@ class Cache:
             "get_record",
             {
                 "hash": hash,
+                "path": fp
             },
         ).fetchone()
 
