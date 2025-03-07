@@ -115,6 +115,32 @@ class Cache:
         else:
             return json.loads(row["val"])
 
+    def get_by_hash(
+        self, file_path: Union[str, Path]
+    ) -> Union[str, list, dict, int, float, None]:
+        fp: str
+        if type(file_path) is str:
+            fp = file_path
+            file_path = Path(file_path)
+        else:
+            fp = str(file_path)
+
+        if not file_path.exists():
+            raise ValueError(f"{file_path} does not exist")
+
+        hash = self.get_hash(file_path)
+        row = self.query(
+            "get_record",
+            {
+                "hash": hash
+            },
+        ).fetchone()
+
+        if row is None:
+            return None
+        else:
+            return json.loads(row["val"])
+
     def set(
         self,
         file_path: Union[str, Path],
