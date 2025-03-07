@@ -106,7 +106,7 @@ class Cache:
             "get_record",
             {
                 "hash": hash,
-                "path": fp
+                "key": fp
             },
         ).fetchone()
 
