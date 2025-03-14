@@ -103,7 +103,7 @@ class Cache:
 
         hash = self.get_hash(file_path)
         row = self.query(
-            "get_record_hask_key",
+            "get_record_hash_key",
             {"hash": hash, "key": fp},
         ).fetchone()
 
