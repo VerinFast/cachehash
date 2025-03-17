@@ -158,10 +158,8 @@ class Cache:
 
         hash = self.get_hash(file_path)
         existing_record = self.query(
-            "get_record",
-            {
-                "hash": hash,
-            },
+            "get_record_hash_key",
+            {"hash": hash, "key": fp},
         ).fetchone()
         if existing_record is not None and append is False:
             v = existing_record["val"]
