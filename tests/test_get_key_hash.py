@@ -13,8 +13,8 @@ def test_two_writes_same_hash():
         os.remove(test_db)
     assert not test_db.exists(), "Test3 DB exists"
     cache = Cache("test3.db")
-    file1 = Path("./fixtures/file1.txt")
-    file2 = Path("./fixtures/file2.txt")
+    file1 = Path("./tests/fixtures/file1.txt")
+    file2 = Path("./tests/fixtures/file2.txt")
     cache.set(file1, {"file": str(file1)})
     file1data = cache.get(file1)
     assert file1data["file"] == str(file1), "Invalid file1"
