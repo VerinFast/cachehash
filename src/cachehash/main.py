@@ -9,8 +9,6 @@ from xxhash import xxh32 as xh
 
 default_path = Path("./temp.db")
 
-import os
-
 
 class Cache:
     # BUF_SIZE is totally arbitrary
