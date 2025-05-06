@@ -45,7 +45,6 @@ class Cache:
         except FileNotFoundError:
             return False
 
-
     def query(self, file_name: str, parameters=None, query: Union[str, None] = None):
         cur_path = Path(__file__).parent.resolve().absolute()
         path = Path(f"{cur_path}/sql/{file_name}.sql")
