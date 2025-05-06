@@ -34,7 +34,6 @@ class Cache:
     def is_regular_file(self, path: Path):
         """
         Checks if the given path is a regular file (not a socket, directory, etc.).
-    
         Args:
             path: The path to check.
     
