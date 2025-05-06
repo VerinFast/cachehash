@@ -1,6 +1,7 @@
 import json
-import sqlite3
 import os
+import sqlite3
+import stat
 from pathlib import Path
 from typing import Union
 
@@ -28,6 +29,20 @@ class Cache:
         self.table_name = table
         self.query("make_table")
 
+    def is_regular_file(self, path: Path):
+        """
+        Checks if the given path is a regular file (not a socket, directory, etc.).
+        Args:
+            path: The path to check.
+        Returns:
+            True if the path is a regular file, False otherwise.
+        """
+        try:
+            mode = os.stat(path).st_mode
+            return stat.S_ISREG(mode)
+        except FileNotFoundError:
+            return False
+
     def query(self, file_name: str, parameters=None, query: Union[str, None] = None):
         cur_path = Path(__file__).parent.resolve().absolute()
         path = Path(f"{cur_path}/sql/{file_name}.sql")
@@ -48,6 +63,8 @@ class Cache:
 
     def hash_file(self, fp: Path) -> str:
         h = xh()
+        if not self.is_regular_file(fp):
+            return "Error: " + str(fp.absolute()) + "- Unhashable file type"
         with open(fp, "rb") as f:
             while True:
                 data = f.read(self.BUF_SIZE)
