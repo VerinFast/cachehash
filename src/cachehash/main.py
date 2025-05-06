@@ -12,8 +12,6 @@ default_path = Path("./temp.db")
 import os
 
 
-
-
 class Cache:
     # BUF_SIZE is totally arbitrary
     BUF_SIZE = 65536  # default 64kb chunks
