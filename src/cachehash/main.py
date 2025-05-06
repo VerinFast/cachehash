@@ -66,7 +66,7 @@ class Cache:
     def hash_file(self, fp: Path) -> str:
         h = xh()
         if not self.is_regular_file(fp):
-            return "Can't hash Unix Sockets"
+            return str(fp.absolute()) + ": Can't hash Unix Sockets"
         with open(fp, "rb") as f:
             while True:
                 data = f.read(self.BUF_SIZE)
