@@ -36,7 +36,6 @@ class Cache:
         Checks if the given path is a regular file (not a socket, directory, etc.).
         Args:
             path: The path to check.
-    
         Returns:
             True if the path is a regular file, False otherwise.
         """
