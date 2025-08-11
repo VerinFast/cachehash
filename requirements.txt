@@ -1,2 +1,2 @@
-coverage~=7.9.1
+coverage~=7.10.3
 xxhash>=3.5.0
