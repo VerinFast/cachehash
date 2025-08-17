@@ -16,7 +16,7 @@ def test_set_get_value():
     sleep(0.1)
     cache.set_value("foo", {"now": now})
     sleep(0.1)
-    result = cache.get("foo")
+    result = cache.get_value("foo")
     assert result is not None, "Cache returned None"
     new_now = result["now"]
 
