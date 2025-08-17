@@ -13,6 +13,7 @@ Notes
 - Hashing uses `xxhash` (xxh32) for good speed; it is not a cryptographic hash.
 
 """
+
 from __future__ import annotations
 
 import json
@@ -50,7 +51,9 @@ class Cache:
     # Read files in 64 KiB chunks by default
     BUF_SIZE = 64 * 1024
 
-    def __init__(self, path: Union[Path, str] = DEFAULT_DB_PATH, table: str = "cachehash") -> None:
+    def __init__(
+        self, path: Union[Path, str] = DEFAULT_DB_PATH, table: str = "cachehash"
+    ) -> None:
         self.db_path: Path = Path(path)
         self.table_name: str = table
 
@@ -254,7 +257,9 @@ class Cache:
             raise ValueError(f"{p} does not exist")
 
         hsh = self.get_hash(p)
-        row = self.query("get_record_hash_key", {"hash": hsh, "key": key_str}).fetchone()
+        row = self.query(
+            "get_record_hash_key", {"hash": hsh, "key": key_str}
+        ).fetchone()
         return None if row is None else json.loads(row["val"])  # type: ignore[index]
 
     def get_by_hash(self, file_path: Union[str, Path]) -> Any | None:
@@ -294,10 +299,14 @@ class Cache:
             exists and the value changed; otherwise insert.
         """
         serialized = json.dumps(value)
-        existing = self.query("get_record_hash_key", {"hash": hash, "key": key}).fetchone()
+        existing = self.query(
+            "get_record_hash_key", {"hash": hash, "key": key}
+        ).fetchone()
         if existing is not None and not append:
             if existing["val"] != serialized:  # type: ignore[index]
-                self.query("update_record", {"key": key, "hash": hash, "value": serialized})
+                self.query(
+                    "update_record", {"key": key, "hash": hash, "value": serialized}
+                )
         else:
             self.query("insert_record", {"key": key, "hash": hash, "value": serialized})
         self.db.commit()
