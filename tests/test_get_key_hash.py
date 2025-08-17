@@ -1,8 +1,5 @@
 import os
-import datetime
-import tempfile
 from pathlib import Path
-from time import sleep
 
 from cachehash.main import Cache
 
@@ -17,9 +14,11 @@ def test_two_writes_same_hash():
     file2 = Path("./tests/fixtures/file2.txt")
     cache.set(file1, {"file": str(file1)})
     file1data = cache.get(file1)
+    assert file1data is not None, "file1data is None"
     assert file1data["file"] == str(file1), "Invalid file1"
     cache.set(file2, {"file": str(file2)})
     file2data = cache.get(file2)
+    assert file2data is not None, "file2data is None"
     assert file2data["file"] == str(file2), "Invalid file2"
     os.remove(test_db)
     assert not test_db.exists(), "Test DB not removed"
