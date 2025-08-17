@@ -140,7 +140,7 @@ class Cache:
         """
         try:
             mode = os.stat(path).st_mode
-        except FileNotFoundError:
+        except (FileNotFoundError, OSError):
             return False
         return _stat.S_ISREG(mode)
 
