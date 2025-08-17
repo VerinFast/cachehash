@@ -331,14 +331,30 @@ class Cache:
         self.set_by_hash(key_str, hsh, value, append=append)
 
     def set_value(self, key: str, value: Any) -> None:
-        """Store a value by *key only* (not bound to a content hash).
+        """Upsert a value by *key only* using a stable sentinel hash.
 
-        This assumes your SQL provides an `update_record` variant that targets
-        rows by `key` when `hash` is absent. If not, consider supplying a custom
-        query here or changing your schema to include a dedicated key-only table.
+        We derive a deterministic `key_hash = hash_value(key)` and store rows under
+        (key, key_hash) so they work with the existing SQL (`update_record`,
+        `insert_record`) that expects both `key` and `hash` parameters.
+
+        This keeps the table schema unchanged while supporting key-only storage.
         """
         serialized = json.dumps(value)
-        self.query("update_record", {"key": key, "value": serialized})
+        key_hash = self.hash_value(key)
+
+        # Try update first; if nothing was updated, insert.
+        cur = self.query(
+            "update_record",
+            {"key": key, "hash": key_hash, "value": serialized},
+        )
+
+        # sqlite3 returns rowcount for UPDATE; 0 means no existing row matched.
+        if getattr(cur, "rowcount", 0) == 0:
+            self.query(
+                "insert_record",
+                {"key": key, "hash": key_hash, "value": serialized},
+            )
+
         self.db.commit()
 
     def get_value(self, key: str) -> Any | None:
@@ -348,5 +364,5 @@ class Cache:
         rows by `key` when `hash` is absent. If not, consider supplying a custom
         query here or changing your schema to include a dedicated key-only table.
         """
-        row = self.query("get_record", {"key": key}).fetchone()
+        row = self.query("get_record_key", {"key": key}).fetchone()
         return None if row is None else json.loads(row["val"])  # type: ignore[index]
