@@ -21,7 +21,7 @@ import os
 import sqlite3
 import stat as _stat
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 from xxhash import xxh32 as xh
 
@@ -52,7 +52,7 @@ class Cache:
     BUF_SIZE = 64 * 1024
 
     def __init__(
-        self, path: Union[Path, str] = DEFAULT_DB_PATH, table: str = "cachehash"
+        self, path: Path | str = DEFAULT_DB_PATH, table: str = "cachehash"
     ) -> None:
         self.db_path: Path = Path(path)
         self.table_name: str = table
@@ -92,8 +92,8 @@ class Cache:
     def query(
         self,
         file_name: str,
-        parameters: Optional[dict[str, Any]] = None,
-        query: Optional[str] = None,
+        parameters: dict[str, Any] | None = None,
+        query: str | None = None,
     ) -> sqlite3.Cursor:
         """Execute a SQL statement.
 
@@ -209,7 +209,7 @@ class Cache:
 
         return h.hexdigest()
 
-    def hash_value(self, value: Union[str, bytes]) -> str:
+    def hash_value(self, value: str | bytes) -> str:
         """Compute a xxh32 digest for an arbitrary string/bytes value."""
         h = xh()
         if isinstance(value, str):
@@ -235,7 +235,7 @@ class Cache:
     # Public API: get / set by path or by precomputed hash
     # ---------------------------------------------------------------------
     @staticmethod
-    def _coerce_path(p: Union[str, Path]) -> tuple[str, Path]:
+    def _coerce_path(p: str | Path) -> tuple[str, Path]:
         """Return `(as_string, as_path)` ensuring `Path` type and original string."""
         if isinstance(p, str):
             return p, Path(p)
@@ -243,7 +243,7 @@ class Cache:
             return str(p), p
         raise ValueError("Invalid file_path")
 
-    def get(self, file_path: Union[str, Path]) -> Any | None:
+    def get(self, file_path: str | Path) -> Any | None:
         """Get a cached value by *current* content hash **and** key=filepath.
 
         Returns
@@ -262,7 +262,7 @@ class Cache:
         ).fetchone()
         return None if row is None else json.loads(row["val"])  # type: ignore[index]
 
-    def get_by_hash(self, file_path: Union[str, Path]) -> Any | None:
+    def get_by_hash(self, file_path: str | Path) -> Any | None:
         """Get a cached value by *current* content hash only (ignores key).
 
         Useful when the same bytes appear at different paths.
@@ -313,7 +313,7 @@ class Cache:
 
     def set(
         self,
-        file_path: Union[str, Path],
+        file_path: str | Path,
         value: Any,
         *,
         append: bool = False,
