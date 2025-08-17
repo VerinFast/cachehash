@@ -21,6 +21,6 @@ def test_set_get_value():
     new_now = result["now"]
 
     assert test_db.exists(), "Test DB not created"
-    assert now == new_now, "Invalid 'now"
+    assert now == new_now, "Invalid 'now'"
     os.remove(test_db)
     assert not test_db.exists(), "Test DB not removed"
