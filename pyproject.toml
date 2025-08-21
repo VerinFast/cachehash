@@ -16,7 +16,7 @@ classifiers = [
     "License :: Free for non-commercial use",
     "Operating System :: OS Independent",
 ]
-version = "0.1.0"
+dynamic = ["version"]
 dependencies = [
     "xxhash>=3.5.0",
 ]
@@ -37,5 +37,8 @@ Source = "https://github.com/VerinFast/cachehash"
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.hatch.version]
+path = "VERSION.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cachehash"]
