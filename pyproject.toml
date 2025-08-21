@@ -1,11 +1,5 @@
 [build-system]
-requires = [
-  "hatchling",
-  "setuptools",
-  "setuptools_scm[toml]>=6.0",
-  "build",
-  "hatch-requirements-txt",
-]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
@@ -22,33 +16,26 @@ classifiers = [
     "License :: Free for non-commercial use",
     "Operating System :: OS Independent",
 ]
-dynamic = ["dependencies", "version"]
-
-[project.urls]
-"Homepage" = "https://github.com/VerinFast/cachehash"
-"Bug Tracker" = "https://github.com/VerinFast/cachehash/issues"
-"Source" = "https://github.com/VerinFast/cachehash"
-
-# [project.scripts]
-# verinfast = "cachehash.main:main"
+version = "0.1.0"
+dependencies = [
+    "xxhash>=3.5.0",
+]
 
 [project.optional-dependencies]
 dev = [
     "black>=24.1.1",
     "pytest",
-    "pytest-cov"
+    "pytest-cov",
+    "coverage~=7.10.3",
 ]
 
+[project.urls]
+Homepage = "https://github.com/VerinFast/cachehash"
+"Bug Tracker" = "https://github.com/VerinFast/cachehash/issues"
+Source = "https://github.com/VerinFast/cachehash"
+
 [tool.pytest.ini_options]
-addopts = [
-    "--import-mode=importlib",
-]
+addopts = ["--import-mode=importlib"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.hatch.version]
-path = "VERSION.py"
-
-[tool.hatch.metadata.hooks.requirements_txt]
-files = ["requirements.txt"]

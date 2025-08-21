@@ -18,7 +18,9 @@ def test_basics():
     this_file = os.path.abspath(__file__)
     cache.set(this_file, {"now": now})
     sleep(0.1)
-    new_now = cache.get(this_file)["now"]
+    result = cache.get(this_file)
+    assert result is not None, "Cache returned None"
+    new_now = result["now"]
 
     assert test_db.exists(), "Test DB not created"
     assert now == new_now, "Invalid 'now"
@@ -40,7 +42,9 @@ def test_close_and_reopen():
     cache.db.close()
     del cache
     cache = Cache("test.db")
-    new_now = cache.get(this_file)["now"]
+    result = cache.get(this_file)
+    assert result is not None, "Cache returned None"
+    new_now = result["now"]
     assert test_db.exists(), "Test DB not created"
     assert now == new_now, "Invalid 'now"
     os.remove(test_db)
@@ -59,7 +63,9 @@ def test_second_connection():
     cache.set(this_file, {"now": now})
     sleep(0.1)
     cache2 = Cache("test.db")
-    new_now = cache2.get(this_file)["now"]
+    result = cache2.get(this_file)
+    assert result is not None, "Cache returned None"
+    new_now = result["now"]
     assert test_db.exists(), "Test DB not created"
     assert now == new_now, "Invalid 'now"
     os.remove(test_db)
@@ -80,7 +86,9 @@ def test_two_writes():
     new_now = str(datetime.datetime.now())
     cache.set(this_file, {"now": new_now})
     sleep(0.1)
-    pulled_now = cache.get(this_file)["now"]
+    result = cache.get(this_file)
+    assert result is not None, "Cache returned None"
+    pulled_now = result["now"]
     assert test_db.exists(), "Test DB not created"
     assert new_now == pulled_now, "Invalid 'now"
     os.remove(test_db)
@@ -112,6 +120,7 @@ def test_directory_hash():
         now = str(datetime.datetime.now())
         cache.set(temp_path, {"now": now})
         cached_value = cache.get(temp_path)
+        assert cached_value is not None, "Initial cache failed: cache returned None"
         assert cached_value["now"] == now, "Initial cache failed"
 
         # Modify a file and verify cache invalidation
@@ -140,6 +149,7 @@ def test_valid_types():
     cache.set(this_file, test_dict)
     sleep(0.1)
     cache_value = cache.get(this_file)
+    assert cache_value is not None, "Cache returned None for Dict"
     value = cache_value["key"]
     assert value == "value", "Invalid Dict value"
     assert isinstance(cache_value, dict), "Invalid Dict value type"
@@ -150,6 +160,7 @@ def test_valid_types():
     cache.set(this_file, test_list)
     sleep(0.1)
     cache_value_list = cache.get(this_file)
+    assert cache_value_list is not None, "Cache returned None for List"
     value2 = cache_value_list[1]
     assert value2 == "value2", "Invalid List value"
     assert isinstance(cache_value_list, list), "Invalid List value type"
