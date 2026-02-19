@@ -10,7 +10,7 @@ authors = [
 ]
 description = "This tool memoizes data to sqlite."
 readme = "README.md"
-requires-python = ">=3.11,<=3.14"
+requires-python = ">=3.11,<3.15"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: Free for non-commercial use",
