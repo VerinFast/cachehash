@@ -89,7 +89,9 @@ black src
 
 ## License
 
-Free for **non-commercial use**. See [LICENSE](LICENSE) for details.
+Source-available under the **Elastic License 2.0**: use it, copy it, modify it —
+but do not offer it to others as a hosted or managed service. See
+[LICENSE](LICENSE) for the full text.
 
 ---
 
